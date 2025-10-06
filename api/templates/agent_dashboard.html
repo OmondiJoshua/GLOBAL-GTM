@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .dashboard-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .editable {
+            background-color: #e8f4fd;
+        }
+        .locked {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>Agent Dashboard</h1>
+        <p>Welcome, Agent! You can update feedback for assigned entries.</p>
+    </div>
+
+    <div class="filters">
+        <label for="area-filter">Filter by Area:</label>
+        <select id="area-filter">
+            <option value="all">All Areas</option>
+            <!-- Areas will be populated dynamically -->
+        </select>
+    </div>
+
+    <div class="table-container" style="overflow-x: auto; max-height: 600px;">
+        <table class="data-table" id="report-table">
+            <thead>
+                <tr>
+                    <th>ENTRY ID</th>
+                    <th>REGION</th>
+                    <th>AREA</th>
+                    <th>NODE</th>
+                    <th>ROAD</th>
+                    <th>BLDNG</th>
+                    <th>ACTUAL BUILD NAME</th>
+                    <th>YEAR</th>
+                    <th>HPRFS</th>
+                    <th>ACTIVE</th>
+                    <th>PAYING</th>
+                    <th>FEEDBACK</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <button class="save-btn" id="save-changes">Save Changes</button>
+
+    <script>
+        // Sample data - in a real app, this would come from an API
+        const reportData = [
+            {
+                "ENTRY ID": "109-37126",
+                "REGION": "WANJIKU SOUTH",
+                "AREA": "ATHI RIVER",
+                "NODE": "FMT100-1",
+                "ROAD": "MOMBASA ROAD MAVOKO LANE",
+                "BLDNG": "RIVERPARK ESTATE",
+                "ACTUAL BUILD NAME": "",
+                "YEAR": 2019,
+                "HPRFS": 10,
+                "ACTIVE": 0,
+                "PAYING": 0,
+                "FEEDBACK": ""
+            },
+            {
+                "ENTRY ID": "109-37127",
+                "REGION": "WANJIKU SOUTH",
+                "AREA": "ATHI RIVER",
+                "NODE": "FMT100-1A",
+                "ROAD": "MOMBASA ROAD MAVOKO LANE",
+                "BLDNG": "RIVERPARK ESTATE",
+                "ACTUAL BUILD NAME": "",
+                "YEAR": 2019,
+                "HPRFS": 1,
+                "ACTIVE": 0,
+                "PAYING": 0,
+                "FEEDBACK": "Initial contact made"
+            },
+            // More data rows would be here...
+        ];
+
+        // Populate the table with data
+        function populateTable(data) {
+            const tbody = document.querySelector('#report-table tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Add locked columns
+                Object.keys(row).forEach(key => {
+                    if (key !== "FEEDBACK") {
+                        const td = document.createElement('td');
+                        td.textContent = row[key];
+                        td.classList.add('locked');
+                        tr.appendChild(td);
+                    }
+                });
+                
+                // Add editable feedback column
+                const feedbackTd = document.createElement('td');
+                const textarea = document.createElement('textarea');
+                textarea.value = row.FEEDBACK || '';
+                textarea.dataset.entryId = row["ENTRY ID"];
+                feedbackTd.appendChild(textarea);
+                feedbackTd.classList.add('editable');
+                tr.appendChild(feedbackTd);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable(reportData);
+            
+            // Set up area filter
+            const areas = [...new Set(reportData.map(row => row.AREA))];
+            const areaFilter = document.getElementById('area-filter');
+            areas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                areaFilter.appendChild(option);
+            });
+            
+            // Filter functionality
+            areaFilter.addEventListener('change', function() {
+                const selectedArea = this.value;
+                const filteredData = selectedArea === 'all' 
+                    ? reportData 
+                    : reportData.filter(row => row.AREA === selectedArea);
+                populateTable(filteredData);
+            });
+            
+            // Save changes functionality
+            document.getElementById('save-changes').addEventListener('click', function() {
+                const textareas = document.querySelectorAll('textarea');
+                const updates = [];
+                
+                textareas.forEach(textarea => {
+                    if (textarea.value.trim() !== '') {
+                        updates.push({
+                            entryId: textarea.dataset.entryId,
+                            feedback: textarea.value
+                        });
+                    }
+                });
+                
+                // In a real app, send updates to the server
+                console.log('Saving feedback:', updates);
+                alert(`Successfully saved ${updates.length} feedback entries.`);
+            });
+        });
+    </script>
+</body>
+</html>

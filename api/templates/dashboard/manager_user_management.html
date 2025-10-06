@@ -1,0 +1,626 @@
+<div class="row">
+    <div class="col-md-4">
+        <!-- Add User Form -->
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Add New User</h3>
+            </div>
+            <form id="addUserForm">
+                <div class="card-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="userRole">Role</label>
+                        <select class="form-control select2" id="userRole" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="agent">Agent</option>
+                            <option value="supervisor">Supervisor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" name="first_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" name="last_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userEmail">Email</label>
+                        <input type="email" class="form-control" id="userEmail" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userPhone">Phone Number</label>
+                        <input type="tel" class="form-control" id="userPhone" name="phone_number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userCounty">County</label>
+                        <select class="form-control select2" id="userCounty" name="county" required>
+                            <option value="">Select County</option>
+                            {% for county_value, county_name in county_choices %}
+                                <option value="{{ county_value }}">{{ county_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userSublocation">Sublocation</label>
+                        <select class="form-control select2" id="userSublocation" name="sublocation" required>
+                            <option value="">Select Sublocation</option>
+                            {% for sub_value, sub_name in sublocation_choices %}
+                                <option value="{{ sub_value }}">{{ sub_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-user-plus"></i> Add User
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Users List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">User Management</h3>
+                <div class="card-tools">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                            <a href="#" class="dropdown-item filter-users" data-role="all">All Users</a>
+                            <a href="#" class="dropdown-item filter-users" data-role="agent">Agents Only</a>
+                            <a href="#" class="dropdown-item filter-users" data-role="supervisor">Supervisors Only</a>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-tool" onclick="loadUsers()" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped datatable">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>County</th>
+                            <th>Sublocation</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h5 class="modal-title text-white" id="successModalLabel">
+                    <i class="fas fa-check-circle"></i> Success!
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-check fa-3x text-success mb-3"></i>
+                    <h4 id="successMessage"></h4>
+                </div>
+                <div class="progress" style="height: 6px;">
+                    <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+                </div>
+                <small class="text-muted">This message will close automatically in <span id="countdown">5</span> seconds</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+                </div>
+                <h4>Adding User...</h4>
+                <p>Please wait while we create the user account</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    0% { background-position: 1rem 0; }
+    100% { background-position: 0 0; }
+}
+
+.success-animation {
+    animation: bounceIn 0.6s;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+</style>
+
+<script>
+// Global debug flag
+const DEBUG = true;
+
+function log(message, data = null) {
+    if (DEBUG) {
+        console.log(`🔍 ${message}`, data || '');
+    }
+}
+
+$(document).ready(function() {
+    log('Document ready - initializing user management');
+    
+    // Initialize first
+    initializeDataTable();
+    loadUsers();
+    
+    // Handle form submission
+    $('#addUserForm').on('submit', function(e) {
+        e.preventDefault();
+        addUser();
+    });
+    
+    // Filter users
+    $('.filter-users').on('click', function(e) {
+        e.preventDefault();
+        const role = $(this).data('role');
+        loadUsers(role);
+    });
+    
+    // Initialize Select2
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+    
+    log('User management initialized');
+});
+
+function initializeDataTable() {
+    log('Initializing DataTable');
+    
+    // Destroy existing DataTable if it exists
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        log('Destroying existing DataTable');
+        $('.datatable').DataTable().destroy();
+        $('.datatable tbody').empty();
+    }
+    
+    // Initialize new DataTable
+    $('.datatable').DataTable({
+        "pageLength": 10,
+        "responsive": true,
+        "autoWidth": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "language": {
+            "emptyTable": "No users found",
+            "zeroRecords": "No matching users found"
+        }
+    });
+    
+    log('DataTable initialized');
+}
+
+function loadUsers(role = 'all') {
+    log('Loading users with role filter:', role);
+    
+    // Show loading state
+    $('#usersTableBody').html(`
+        <tr>
+            <td colspan="8" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                <div class="mt-2">Loading users...</div>
+            </td>
+        </tr>
+    `);
+    
+    // FIXED: Use the correct API URL with double "api" prefix
+    const url = '/api/users/';
+    log('Making API request to:', url);
+    
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: role !== 'all' ? { role: role } : {},
+        success: function(response) {
+            log('API response received:', response);
+            updateUsersTable(response);
+            showLoadingState(false);
+        },
+        error: function(xhr, status, error) {
+            log('API error:', { status: xhr.status, error: error, response: xhr.responseText });
+            
+            let errorMessage = 'Error loading users';
+            if (xhr.status === 403) {
+                errorMessage = 'Access denied. Manager privileges required.';
+            } else if (xhr.status === 404) {
+                errorMessage = 'API endpoint not found. Please check the URL.';
+            }
+            
+            showAlert(errorMessage, 'danger');
+            showLoadingState(false);
+            updateUsersTable([]);
+        }
+    });
+}
+
+function addUser() {
+    log('Adding new user');
+    
+    const formData = new FormData($('#addUserForm')[0]);
+    const submitBtn = $('#submitBtn');
+    
+    // Show loading state
+    submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding User...');
+    $('#loadingModal').modal('show');
+    
+    // FIXED: Use the correct API URL with double "api" prefix
+    $.ajax({
+        url: '/api/users/',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRFToken': getCSRFToken()
+        },
+        success: function(response) {
+            log('User added successfully:', response);
+            
+            // Hide loading modal
+            $('#loadingModal').modal('hide');
+            submitBtn.prop('disabled', false).html('<i class="fas fa-user-plus"></i> Add User');
+            
+            // Show success modal
+            const userName = `${response.first_name || ''} ${response.last_name || ''}`.trim() || 'New User';
+            const userRole = response.role;
+            const employeeId = response.employee_id;
+            
+            showSuccessModal(userName, userRole, employeeId);
+            
+            // Reset form and reload users
+            resetForm();
+            loadUsers();
+        },
+        error: function(xhr, status, error) {
+            log('Add user error:', { status: xhr.status, error: error, response: xhr.responseText });
+            
+            // Hide loading modal
+            $('#loadingModal').modal('hide');
+            submitBtn.prop('disabled', false).html('<i class="fas fa-user-plus"></i> Add User');
+            
+            let errorMessage = 'Error adding user. Please check the form.';
+            if (xhr.responseJSON) {
+                const errors = xhr.responseJSON;
+                errorMessage = Object.values(errors).flat().join(', ');
+            }
+            
+            showAlert(errorMessage, 'danger');
+        }
+    });
+}
+
+function showSuccessModal(userName, userRole, employeeId) {
+    log('Showing success modal:', { userName, userRole, employeeId });
+    
+    const roleDisplay = userRole === 'agent' ? 'Agent' : 
+                       userRole === 'supervisor' ? 'Supervisor' : 'Manager';
+    const message = `${roleDisplay} <strong>${userName}</strong> has been added successfully!<br><small class="text-muted">Employee ID: ${employeeId}</small>`;
+    
+    $('#successMessage').html(message);
+    $('#successModal').modal('show');
+    
+    // Start countdown and progress bar
+    let seconds = 5;
+    const countdownElement = $('#countdown');
+    const progressBar = $('#progressBar');
+    
+    progressBar.css('width', '100%');
+    
+    const countdownInterval = setInterval(function() {
+        seconds--;
+        countdownElement.text(seconds);
+        
+        const progressWidth = (seconds / 5) * 100;
+        progressBar.css('width', progressWidth + '%');
+        
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            $('#successModal').modal('hide');
+        }
+    }, 1000);
+    
+    $('#successModal').on('hidden.bs.modal', function() {
+        clearInterval(countdownInterval);
+    });
+}
+
+function updateUsersTable(users) {
+    log('Updating table with users:', users);
+    
+    const tbody = $('#usersTableBody');
+    log('Table body element found:', tbody.length > 0);
+    
+    // Destroy DataTable before updating content
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        log('Destroying DataTable for update');
+        $('.datatable').DataTable().destroy();
+    }
+    
+    // Clear table
+    tbody.empty();
+    log('Table body cleared');
+    
+    if (!users || users.length === 0) {
+        log('No users to display');
+        tbody.append(`
+            <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                    <i class="fas fa-users fa-2x mb-2"></i><br>
+                    No users found
+                </td>
+            </tr>
+        `);
+    } else {
+        log(`Processing ${users.length} users`);
+        
+        users.forEach((user, index) => {
+            log(`Processing user ${index}:`, user);
+            
+            // Handle empty names
+            const firstName = user.first_name || '';
+            const lastName = user.last_name || '';
+            const fullName = `${firstName} ${lastName}`.trim() || 'No Name';
+            
+            const statusBadge = user.is_active ? 
+                '<span class="badge badge-success">Active</span>' : 
+                '<span class="badge badge-danger">Inactive</span>';
+                
+            const roleBadgeClass = getRoleBadge(user.role);
+            const roleDisplay = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            
+            const actions = `
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-info" onclick="editUser(${user.id})" title="Edit User">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-${user.is_active ? 'warning' : 'success'}" 
+                            onclick="toggleUserStatus(${user.id}, ${user.is_active})" 
+                            title="${user.is_active ? 'Deactivate' : 'Activate'} User">
+                        <i class="fas fa-${user.is_active ? 'ban' : 'check'}"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})" title="Delete User">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            const rowHtml = `
+                <tr>
+                    <td><strong>${user.employee_id || 'N/A'}</strong></td>
+                    <td>${fullName}</td>
+                    <td><span class="badge badge-${roleBadgeClass}">${roleDisplay}</span></td>
+                    <td>${user.county || 'N/A'}</td>
+                    <td>${user.sublocation || 'N/A'}</td>
+                    <td>${user.phone_number || 'N/A'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+            
+            log(`Appending row ${index}`);
+            tbody.append(rowHtml);
+        });
+    }
+    
+    // Reinitialize DataTables AFTER content is populated
+    log('Reinitializing DataTable');
+    try {
+        $('.datatable').DataTable({
+            "pageLength": 10,
+            "responsive": true,
+            "autoWidth": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "language": {
+                "emptyTable": "No users found",
+                "zeroRecords": "No matching users found"
+            }
+        });
+        log('DataTable reinitialized successfully');
+    } catch (error) {
+        log('DataTable initialization error:', error);
+    }
+    
+    const rowCount = tbody.find('tr').length;
+    log(`Table update complete. Rows in table: ${rowCount}`);
+}
+
+function showLoadingState(show) {
+    if (show) {
+        $('#usersTableBody').html(`
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                    <div class="mt-2">Loading users...</div>
+                </td>
+            </tr>
+        `);
+    }
+}
+
+function resetForm() {
+    $('#addUserForm')[0].reset();
+    $('.select2').val(null).trigger('change');
+    log('Form reset');
+}
+
+function getRoleBadge(role) {
+    const roleMap = {
+        'agent': 'info',
+        'supervisor': 'success',
+        'manager': 'danger'
+    };
+    return roleMap[role] || 'secondary';
+}
+
+// Global functions for action buttons
+function editUser(userId) {
+    log('Edit user clicked:', userId);
+    showAlert('Edit functionality for user ID: ' + userId + ' will be implemented soon.', 'info');
+}
+
+function toggleUserStatus(userId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    log('Toggle user status:', { userId, action });
+    
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+        // FIXED: Use the correct API URL with double "api" prefix
+        $.ajax({
+            url: `/api/users/${userId}/toggle_status/`,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            },
+            success: function(response) {
+                log('User status toggled successfully:', response);
+                showAlert(`User ${action}d successfully`, 'success');
+                loadUsers();
+            },
+            error: function(xhr) {
+                log('Toggle status error:', xhr);
+                showAlert('Error updating user status', 'danger');
+            }
+        });
+    }
+}
+
+function deleteUser(userId) {
+    log('Delete user clicked:', userId);
+    
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        // FIXED: Use the correct API URL with double "api" prefix
+        $.ajax({
+            url: `/api/users/${userId}/`,
+            type: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            },
+            success: function(response) {
+                log('User deleted successfully:', response);
+                showAlert('User deleted successfully', 'success');
+                loadUsers();
+            },
+            error: function(xhr) {
+                log('Delete user error:', xhr);
+                showAlert('Error deleting user', 'danger');
+            }
+        });
+    }
+}
+
+function getCSRFToken() {
+    const token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    log('CSRF token retrieved:', token ? 'Yes' : 'No');
+    return token;
+}
+
+function showAlert(message, type) {
+    log('Showing alert:', { message, type });
+    
+    // Remove any existing alerts
+    $('.alert-dismissible').remove();
+    
+    const alertClass = `alert-${type}`;
+    const icon = type === 'success' ? 'fa-check-circle' : 
+                 type === 'danger' ? 'fa-exclamation-circle' :
+                 type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            <i class="fas ${icon} mr-2"></i>
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `;
+    
+    $('.content').prepend(alertHtml);
+    
+    setTimeout(() => {
+        $('.alert-dismissible').alert('close');
+    }, 5000);
+}
+
+// Manual test function
+function testTableManually() {
+    log('Manual test started');
+    const testUsers = [
+        {
+            id: 999,
+            employee_id: 'TEST001',
+            first_name: 'Test',
+            last_name: 'User',
+            role: 'agent',
+            county: 'nairobi',
+            sublocation: 'central',
+            phone_number: '0712345678',
+            is_active: true
+        }
+    ];
+    updateUsersTable(testUsers);
+}
+</script>

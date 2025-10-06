@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard System - Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AdminLTE 3 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login-logo a {
+            font-size: 35px;
+            font-weight: 300;
+        }
+        .login-box {
+            width: 360px;
+            margin: 7% auto;
+        }
+        .login-card-body {
+            padding: 20px;
+            border-top: 0;
+            color: #666;
+        }
+        .dashboard-card {
+            transition: transform 0.3s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%) !important;
+        }
+        .sidebar-dark-primary {
+            background-color: #343a40;
+        }
+        .content-wrapper {
+            background-color: #f4f6f9;
+        }
+        .info-box {
+            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            border-radius: .25rem;
+            background: #fff;
+            display: flex;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            padding: .5rem;
+            position: relative;
+        }
+        .info-box-icon {
+            align-items: center;
+            display: flex;
+            font-size: 1.875rem;
+            justify-content: center;
+            text-align: center;
+            width: 70px;
+        }
+        .info-box-content {
+            flex: 1;
+            padding: 5px 10px;
+        }
+        .info-box-text {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .info-box-number {
+            display: block;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#"><b>Dashboard</b>System</a>
+        </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
+                <form action="#" method="post">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">
+                                    Remember Me
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        </div>
+                    </div>
+                </form>
+                <p class="mb-1">
+                    <a href="#">I forgot my password</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Template (hidden initially) -->
+    <div id="main-template" style="display:none;">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="#" class="nav-link">Home</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <span class="dropdown-item dropdown-header">User Profile</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user mr-2"></i> Profile
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="#" class="brand-link">
+                <span class="brand-text font-weight-light">Dashboard System</span>
+            </a>
+            <div class="sidebar">
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="agent-dashboard-link">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Agent Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="supervisor-dashboard-link">
+                                <i class="nav-icon fas fa-user-tie"></i>
+                                <p>Supervisor Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="manager-dashboard-link">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p>Manager Dashboard</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 id="page-title">Dashboard</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active" id="breadcrumb-active">Dashboard</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Dashboard content will be loaded here -->
+                    <div id="dashboard-content">
+                        <!-- Agent Dashboard -->
+                        <div class="dashboard" id="agent-dashboard">
+                            <div class="row">
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-info">
+                                        <div class="inner">
+                                            <h3>150</h3>
+                                            <p>Total Tasks</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-tasks"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-success">
+                                        <div class="inner">
+                                            <h3>53<sup style="font-size: 20px">%</sup></h3>
+                                            <p>Completion Rate</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-warning">
+                                        <div class="inner">
+                                            <h3>44</h3>
+                                            <p>Pending Tasks</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-danger">
+                                        <div class="inner">
+                                            <h3>65</h3>
+                                            <p>Overdue Tasks</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Recent Activities</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Task ID</th>
+                                                            <th>Task Name</th>
+                                                            <th>Status</th>
+                                                            <th>Due Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>#TASK-001</td>
+                                                            <td>Customer Support</td>
+                                                            <td><span class="badge badge-success">Completed</span></td>
+                                                            <td>2023-05-15</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#TASK-002</td>
+                                                            <td>Data Entry</td>
+                                                            <td><span class="badge badge-warning">Pending</span></td>
+                                                            <td>2023-05-20</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#TASK-003</td>
+                                                            <td>Follow-up Call</td>
+                                                            <td><span class="badge badge-danger">Overdue</span></td>
+                                                            <td>2023-05-10</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Performance</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="progress-group">
+                                                Task Completion
+                                                <span class="float-right"><b>53%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-primary" style="width: 53%"></div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-group">
+                                                Quality Score
+                                                <span class="float-right"><b>78%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-success" style="width: 78%"></div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-group">
+                                                Productivity
+                                                <span class="float-right"><b>65%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Supervisor Dashboard -->
+                        <div class="dashboard" id="supervisor-dashboard" style="display:none;">
+                            <div class="row">
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-info">
+                                        <div class="inner">
+                                            <h3>12</h3>
+                                            <p>Team Members</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-success">
+                                        <div class="inner">
+                                            <h3>78<sup style="font-size: 20px">%</sup></h3>
+                                            <p>Team Performance</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-chart-pie"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-warning">
+                                        <div class="inner">
+                                            <h3>24</h3>
+                                            <p>Pending Approvals</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-clipboard-check"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-danger">
+                                        <div class="inner">
+                                            <h3>5</h3>
+                                            <p>Escalated Issues</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Team Performance</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Agent Name</th>
+                                                            <th>Tasks Completed</th>
+                                                            <th>Quality Score</th>
+                                                            <th>Productivity</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>John Smith</td>
+                                                            <td>45</td>
+                                                            <td>85%</td>
+                                                            <td>92%</td>
+                                                            <td><span class="badge badge-success">Active</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Sarah Johnson</td>
+                                                            <td>38</td>
+                                                            <td>78%</td>
+                                                            <td>85%</td>
+                                                            <td><span class="badge badge-success">Active</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Michael Brown</td>
+                                                            <td>32</td>
+                                                            <td>72%</td>
+                                                            <td>78%</td>
+                                                            <td><span class="badge badge-warning">Needs Review</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Team Metrics</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="progress-group">
+                                                Overall Performance
+                                                <span class="float-right"><b>78%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-primary" style="width: 78%"></div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-group">
+                                                Quality Assurance
+                                                <span class="float-right"><b>82%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-success" style="width: 82%"></div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-group">
+                                                Adherence to Schedule
+                                                <span class="float-right"><b>75%</b></span>
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar bg-info" style="width: 75%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Manager Dashboard -->
+                        <div class="dashboard" id="manager-dashboard" style="display:none;">
+                            <div class="row">
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-info">
+                                        <div class="inner">
+                                            <h3>45</h3>
+                                            <p>Total Employees</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-success">
+                                        <div class="inner">
+                                            <h3>85<sup style="font-size: 20px">%</sup></h3>
+                                            <p>Department Performance</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-warning">
+                                        <div class="inner">
+                                            <h3>12</h3>
+                                            <p>Open Positions</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-danger">
+                                        <div class="inner">
+                                            <h3>3</h3>
+                                            <p>Critical Issues</p>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Department Overview</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Team</th>
+                                                            <th>Supervisor</th>
+                                                            <th>Members</th>
+                                                            <th>Performance</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Support Team A</td>
+                                                            <td>Jennifer Wilson</td>
+                                                            <td>12</td>
+                                                            <td>85%</td>
+                                                            <td><span class="badge badge-success">Excellent</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Support Team B</td>
+                                                            <td>Robert Davis</td>
+                                                            <td>10</td>
+                                                            <td>78%</td>
+                                                            <td><span class="badge badge-info">Good</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Technical Team</td>
+                                                            <td>Emily Thompson</td>
+                                                            <td>8</td>
+                                                            <td>92%</td>
+                                                            <td><span class="badge badge-success">Excellent</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Manager Tools</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <button class="btn btn-primary btn-block mb-2" data-toggle="modal" data-target="#addAgentModal">
+                                                <i class="fas fa-user-plus mr-2"></i>Add Agent
+                                            </button>
+                                            <button class="btn btn-success btn-block mb-2" data-toggle="modal" data-target="#addSupervisorModal">
+                                                <i class="fas fa-user-tie mr-2"></i>Add Supervisor
+                                            </button>
+                                            <button class="btn btn-info btn-block mb-2" data-toggle="modal" data-target="#addItemModal">
+                                                <i class="fas fa-box mr-2"></i>Add Item Entry
+                                            </button>
+                                            <button class="btn btn-warning btn-block mb-2">
+                                                <i class="fas fa-chart-line mr-2"></i>Generate Reports
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2023 <a href="#">Dashboard System</a>.</strong>
+            All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Version</b> 1.0.0
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals for Manager Dashboard -->
+    <!-- Add Agent Modal -->
+    <div class="modal fade" id="addAgentModal" tabindex="-1" role="dialog" aria-labelledby="addAgentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAgentModalLabel">Add New Agent</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="agentName">Full Name</label>
+                            <input type="text" class="form-control" id="agentName" placeholder="Enter agent's full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="agentEmail">Email Address</label>
+                            <input type="email" class="form-control" id="agentEmail" placeholder="Enter agent's email">
+                        </div>
+                        <div class="form-group">
+                            <label for="agentDepartment">Department</label>
+                            <select class="form-control" id="agentDepartment">
+                                <option>Customer Support</option>
+                                <option>Technical Support</option>
+                                <option>Sales</option>
+                                <option>Billing</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agentSupervisor">Supervisor</label>
+                            <select class="form-control" id="agentSupervisor">
+                                <option>Jennifer Wilson</option>
+                                <option>Robert Davis</option>
+                                <option>Emily Thompson</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add Agent</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supervisor Modal -->
+    <div class="modal fade" id="addSupervisorModal" tabindex="-1" role="dialog" aria-labelledby="addSupervisorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSupervisorModalLabel">Add New Supervisor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="supervisorName">Full Name</label>
+                            <input type="text" class="form-control" id="supervisorName" placeholder="Enter supervisor's full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorEmail">Email Address</label>
+                            <input type="email" class="form-control" id="supervisorEmail" placeholder="Enter supervisor's email">
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorDepartment">Department</label>
+                            <select class="form-control" id="supervisorDepartment">
+                                <option>Customer Support</option>
+                                <option>Technical Support</option>
+                                <option>Sales</option>
+                                <option>Billing</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorTeam">Team Name</label>
+                            <input type="text" class="form-control" id="supervisorTeam" placeholder="Enter team name">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add Supervisor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="itemName">Item Name</label>
+                            <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
+                        </div>
+                        <div class="form-group">
+                            <label for="itemCategory">Category</label>
+                            <select class="form-control" id="itemCategory">
+                                <option>Electronics</option>
+                                <option>Office Supplies</option>
+                                <option>Furniture</option>
+                                <option>Software</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemDescription">Description</label>
+                            <textarea class="form-control" id="itemDescription" rows="3" placeholder="Enter item description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemQuantity">Quantity</label>
+                            <input type="number" class="form-control" id="itemQuantity" placeholder="Enter quantity">
+                        </div>
+                        <div class="form-group">
+                            <label for="itemCost">Cost</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input type="number" class="form-control" id="itemCost" placeholder="Enter cost">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE 3 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Simulate login functionality
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hide login page and show main template
+            document.querySelector('.login-page').style.display = 'none';
+            document.getElementById('main-template').style.display = 'block';
+            
+            // Set up dashboard navigation
+            document.getElementById('agent-dashboard-link').addEventListener('click', function() {
+                showDashboard('agent');
+            });
+            
+            document.getElementById('supervisor-dashboard-link').addEventListener('click', function() {
+                showDashboard('supervisor');
+            });
+            
+            document.getElementById('manager-dashboard-link').addEventListener('click', function() {
+                showDashboard('manager');
+            });
+            
+            // Initialize the first dashboard (Agent)
+            showDashboard('agent');
+        });
+        
+        function showDashboard(type) {
+            // Hide all dashboards
+            document.querySelectorAll('.dashboard').forEach(function(dashboard) {
+                dashboard.style.display = 'none';
+            });
+            
+            // Show selected dashboard
+            document.getElementById(type + '-dashboard').style.display = 'block';
+            
+            // Update page title and breadcrumb
+            const titles = {
+                'agent': 'Agent Dashboard',
+                'supervisor': 'Supervisor Dashboard',
+                'manager': 'Manager Dashboard'
+            };
+            
+            document.getElementById('page-title').textContent = titles[type];
+            document.getElementById('breadcrumb-active').textContent = titles[type];
+            
+            // Update active link in sidebar
+            document.querySelectorAll('.nav-link').forEach(function(link) {
+                link.classList.remove('active');
+            });
+            
+            document.getElementById(type + '-dashboard-link').classList.add('active');
+        }
+    </script>
+</body>
+</html>

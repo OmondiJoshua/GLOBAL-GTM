@@ -1,0 +1,469 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Data Entry Management</h3>
+                <div class="card-tools">
+                    <div class="btn-group">
+                        <button class="btn btn-success" data-toggle="modal" data-target="#bulkAddModal">
+                            <i class="fas fa-upload"></i> Bulk Add
+                        </button>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addEntryModal">
+                            <i class="fas fa-plus"></i> Add Entry
+                        </button>
+                        <button class="btn btn-info" onclick="exportToExcel()">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <select class="form-control select2" id="filterReport" onchange="filterData()">
+                            <option value="">All Reports</option>
+                            <!-- Reports will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control select2" id="filterCounty" onchange="filterData()">
+                            <option value="">All Counties</option>
+                            {% for county_value, county_name in county_choices %}
+                                <option value="{{ county_value }}">{{ county_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control select2" id="filterStatus" onchange="filterData()">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control select2" id="filterService" onchange="filterData()">
+                            <option value="">All Service Types</option>
+                            <option value="installation">Installation</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="repair">Repair</option>
+                            <option value="upgrade">Upgrade</option>
+                            <option value="consultation">Consultation</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="table table-bordered table-striped datatable">
+                    <thead>
+                        <tr>
+                            <th>Entry Number</th>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Service Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Report</th>
+                            <th>Agent Feedback</th>
+                            <th>Supervisor Feedback</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataEntriesTableBody">
+                        <!-- Data entries will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Single Entry Modal -->
+<div class="modal fade" id="addEntryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Data Entry</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addEntryForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="entryReport">Report</label>
+                                <select class="form-control select2" id="entryReport" name="report" required>
+                                    <option value="">Select Report</option>
+                                    <!-- Reports will be loaded dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="entryNumber">Entry Number (Auto-generated if empty)</label>
+                                <input type="text" class="form-control" id="entryNumber" name="entry_number">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="customerName">Customer Name</label>
+                                <input type="text" class="form-control" id="customerName" name="customer_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="customerPhone">Customer Phone</label>
+                                <input type="tel" class="form-control" id="customerPhone" name="customer_phone" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entryLocation">Location</label>
+                        <input type="text" class="form-control" id="entryLocation" name="location" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="serviceType">Service Type</label>
+                                <select class="form-control" id="serviceType" name="service_type" required>
+                                    <option value="">Select Service Type</option>
+                                    <option value="installation">Installation</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="repair">Repair</option>
+                                    <option value="upgrade">Upgrade</option>
+                                    <option value="consultation">Consultation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="entryPriority">Priority</label>
+                                <select class="form-control" id="entryPriority" name="priority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="entryStatus">Status</label>
+                                <select class="form-control" id="entryStatus" name="status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agentFeedback">Agent Feedback</label>
+                        <textarea class="form-control" id="agentFeedback" name="agent_feedback" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supervisorFeedback">Supervisor Feedback</label>
+                        <textarea class="form-control" id="supervisorFeedback" name="supervisor_feedback" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Add Modal -->
+<div class="modal fade" id="bulkAddModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Add Data Entries</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="bulkAddForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="bulkReport">Report</label>
+                        <select class="form-control select2" id="bulkReport" name="report_id" required>
+                            <option value="">Select Report</option>
+                            <!-- Reports will be loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bulkData">Data (JSON format)</label>
+                        <textarea class="form-control" id="bulkData" name="entries" rows="10" required placeholder='[
+  {
+    "customer_name": "John Doe",
+    "customer_phone": "0712345678",
+    "location": "Nairobi CBD",
+    "service_type": "installation",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "customer_name": "Jane Smith",
+    "customer_phone": "0723456789", 
+    "location": "Westlands",
+    "service_type": "maintenance",
+    "priority": "medium",
+    "status": "in_progress"
+  }
+]'></textarea>
+                        <small class="form-text text-muted">
+                            Enter data in JSON format. Each object should contain customer_name, customer_phone, location, service_type, priority, and status.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Bulk Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    loadDataEntries();
+    loadReportsForFilters();
+    
+    // Handle single entry form
+    $('#addEntryForm').on('submit', function(e) {
+        e.preventDefault();
+        addDataEntry();
+    });
+    
+    // Handle bulk add form
+    $('#bulkAddForm').on('submit', function(e) {
+        e.preventDefault();
+        bulkAddEntries();
+    });
+    
+    function loadDataEntries(filters = {}) {
+        $.ajax({
+            url: '/api/report-data/',
+            type: 'GET',
+            data: filters,
+            success: function(response) {
+                updateDataEntriesTable(response);
+            },
+            error: function(xhr) {
+                console.error('Error loading data entries:', xhr);
+                showAlert('Error loading data entries', 'danger');
+            }
+        });
+    }
+    
+    function loadReportsForFilters() {
+        $.ajax({
+            url: '/api/reports/',
+            type: 'GET',
+            success: function(response) {
+                const reportSelects = ['#filterReport', '#entryReport', '#bulkReport'];
+                reportSelects.forEach(selector => {
+                    const select = $(selector);
+                    select.empty().append('<option value="">All Reports</option>');
+                    response.forEach(report => {
+                        select.append(`<option value="${report.id}">${report.title} - ${report.county}</option>`);
+                    });
+                });
+            }
+        });
+    }
+    
+    function addDataEntry() {
+        const formData = new FormData($('#addEntryForm')[0]);
+        
+        $.ajax({
+            url: '/api/report-data/',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                showAlert('Data entry added successfully!', 'success');
+                $('#addEntryModal').modal('hide');
+                $('#addEntryForm')[0].reset();
+                loadDataEntries();
+            },
+            error: function(xhr) {
+                const errors = xhr.responseJSON;
+                let errorMessage = 'Error adding data entry';
+                if (errors) {
+                    errorMessage = Object.values(errors).flat().join(', ');
+                }
+                showAlert(errorMessage, 'danger');
+            }
+        });
+    }
+    
+    function bulkAddEntries() {
+        const formData = new FormData($('#bulkAddForm')[0]);
+        const entriesJson = $('#bulkData').val();
+        
+        try {
+            const entries = JSON.parse(entriesJson);
+            formData.set('entries', JSON.stringify(entries));
+            
+            $.ajax({
+                url: '/api/report-data/bulk_create/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    showAlert(`Successfully added ${response.length} entries!`, 'success');
+                    $('#bulkAddModal').modal('hide');
+                    $('#bulkAddForm')[0].reset();
+                    loadDataEntries();
+                },
+                error: function(xhr) {
+                    const errors = xhr.responseJSON;
+                    let errorMessage = 'Error adding bulk entries';
+                    if (errors) {
+                        errorMessage = Object.values(errors).flat().join(', ');
+                    }
+                    showAlert(errorMessage, 'danger');
+                }
+            });
+        } catch (e) {
+            showAlert('Invalid JSON format: ' + e.message, 'danger');
+        }
+    }
+    
+    function updateDataEntriesTable(entries) {
+        const tbody = $('#dataEntriesTableBody');
+        tbody.empty();
+        
+        entries.forEach(entry => {
+            const statusBadge = getStatusBadge(entry.status);
+            const priorityBadge = getPriorityBadge(entry.priority);
+            const actions = `
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-info" onclick="editEntry(${entry.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteEntry(${entry.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            tbody.append(`
+                <tr>
+                    <td>${entry.entry_number}</td>
+                    <td>${entry.customer_name}</td>
+                    <td>${entry.customer_phone}</td>
+                    <td>${entry.location}</td>
+                    <td>${entry.service_type}</td>
+                    <td><span class="badge ${priorityBadge}">${entry.priority}</span></td>
+                    <td><span class="badge ${statusBadge}">${entry.status}</span></td>
+                    <td>${entry.report_title || 'N/A'}</td>
+                    <td>${entry.agent_feedback || '-'}</td>
+                    <td>${entry.supervisor_feedback || '-'}</td>
+                    <td>${new Date(entry.created_at).toLocaleDateString()}</td>
+                    <td>${actions}</td>
+                </tr>
+            `);
+        });
+    }
+    
+    function getStatusBadge(status) {
+        const statusMap = {
+            'completed': 'badge-success',
+            'in_progress': 'badge-info',
+            'pending': 'badge-warning',
+            'cancelled': 'badge-danger'
+        };
+        return statusMap[status] || 'badge-secondary';
+    }
+    
+    function getPriorityBadge(priority) {
+        const priorityMap = {
+            'urgent': 'badge-danger',
+            'high': 'badge-warning',
+            'medium': 'badge-info',
+            'low': 'badge-secondary'
+        };
+        return priorityMap[priority] || 'badge-secondary';
+    }
+});
+
+// Global functions
+function filterData() {
+    const filters = {
+        report_id: $('#filterReport').val(),
+        county: $('#filterCounty').val(),
+        status: $('#filterStatus').val(),
+        service_type: $('#filterService').val()
+    };
+    
+    // Remove empty filters
+    Object.keys(filters).forEach(key => {
+        if (!filters[key]) delete filters[key];
+    });
+    
+    loadDataEntries(filters);
+}
+
+function exportToExcel() {
+    const reportId = $('#filterReport').val();
+    let url = '/api/report-data/export_excel/';
+    
+    if (reportId) {
+        url += `?report_id=${reportId}`;
+    }
+    
+    window.location.href = url;
+}
+
+function editEntry(entryId) {
+    // Implement edit functionality
+    alert('Edit entry: ' + entryId);
+}
+
+function deleteEntry(entryId) {
+    if (confirm('Are you sure you want to delete this entry?')) {
+        $.ajax({
+            url: `/api/report-data/${entryId}/`,
+            type: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            },
+            success: function(response) {
+                showAlert('Entry deleted successfully', 'success');
+                loadDataEntries();
+            },
+            error: function(xhr) {
+                showAlert('Error deleting entry', 'danger');
+            }
+        });
+    }
+}
+</script>

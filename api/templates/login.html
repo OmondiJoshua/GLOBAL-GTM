@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Global GTM</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 100px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Global GTM Login</h2>
+    <form id="loginForm">
+        {% csrf_token %}
+        <div id="error" class="error"></div> <br>
+        <div class="form-group">
+            <label>Username:</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <div id="error" class="error"></div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log("Login form submitted");
+
+        const formData = new FormData(this);
+        const data = {
+            username: formData.get('username'),
+            password: formData.get('password')
+        };
+
+        try {
+            console.log("Sending login request...");
+            const response = await fetch('/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify(data)
+            });
+
+            console.log("Response status:", response.status);
+            const responseText = await response.text();
+            console.log("Raw response:", responseText);
+
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error("JSON parse error:", parseError);
+                document.getElementById('error').textContent = 'Server error: Invalid response';
+                return;
+            }
+
+            console.log("Parsed result:", result);
+
+            if (!response.ok) {
+                document.getElementById('error').textContent = result.non_field_errors?.[0] || result.error || 'Invalid credentials';
+                return;
+            }
+
+            if (result.redirect) {
+                console.log("Redirect received:", result.redirect);
+                
+                // FIX: Ensure proper URL construction
+                let redirectPath = result.redirect;
+                
+                // Ensure redirectPath starts with /
+                if (!redirectPath.startsWith('/')) {
+                    redirectPath = '/' + redirectPath;
+                }
+                
+                // Remove any duplicate /api/login/ if present
+                redirectPath = redirectPath.replace('/api/login/', '/');
+                
+                // Build final URL properly
+                const finalUrl = window.location.origin + redirectPath;
+                console.log("Final redirect URL:", finalUrl);
+                
+                // Validate URL
+                try {
+                    new URL(finalUrl); // This will throw if invalid
+                    window.location.href = finalUrl;
+                } catch (urlError) {
+                    console.error("Invalid URL:", finalUrl);
+                    document.getElementById('error').textContent = 'Invalid redirect URL';
+                }
+                
+            } else {
+                document.getElementById('error').textContent = "No redirect URL received from server";
+            }
+
+        } catch (error) {
+            console.error("Network error:", error);
+            document.getElementById('error').textContent = 'Network error: ' + error.message;
+        }
+    });
+
+    function getCSRFToken() {
+        const name = 'csrftoken';
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        
+        const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        return csrfInput ? csrfInput.value : '';
+    }
+</script>
+</body>
+</html>

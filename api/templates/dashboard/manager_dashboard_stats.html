@@ -1,0 +1,269 @@
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3 id="total-agents">0</h3>
+                <p>Total Agents</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-friends"></i>
+            </div>
+            <a href="#users" class="small-box-footer" data-toggle="tab">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3 id="total-supervisors">0</h3>
+                <p>Total Supervisors</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <a href="#users" class="small-box-footer" data-toggle="tab">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3 id="total-reports">0</h3>
+                <p>Active Reports</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <a href="#reports" class="small-box-footer" data-toggle="tab">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3 id="completion-rate">0%</h3>
+                <p>Completion Rate</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <a href="#reports" class="small-box-footer" data-toggle="tab">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Charts Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">County Distribution</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="countyChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Report Status</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Activities -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Reports</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="products-list product-list-in-card pl-2 pr-2" id="recent-reports">
+                    <li class="item">
+                        <div class="product-info">
+                            <span class="product-title">Loading...</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recently Added Users</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="products-list product-list-in-card pl-2 pr-2" id="recent-users">
+                    <li class="item">
+                        <div class="product-info">
+                            <span class="product-title">Loading...</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    loadDashboardStats();
+    
+    function loadDashboardStats() {
+        $.ajax({
+            url: '/api/manager/statistics/',
+            type: 'GET',
+            success: function(response) {
+                // Update statistics cards
+                $('#total-agents').text(response.user_stats.total_agents);
+                $('#total-supervisors').text(response.user_stats.total_supervisors);
+                $('#total-reports').text(response.report_stats.total_reports);
+                $('#completion-rate').text(response.report_stats.completion_rate.toFixed(1) + '%');
+                
+                // Update charts
+                updateCountyChart(response.county_stats);
+                updateStatusChart(response.report_stats);
+                
+                // Update recent activities
+                updateRecentReports(response.recent_reports);
+                updateRecentUsers(response.recent_users);
+            },
+            error: function(xhr) {
+                console.error('Error loading dashboard stats:', xhr);
+            }
+        });
+    }
+    
+    function updateCountyChart(countyStats) {
+        const ctx = document.getElementById('countyChart').getContext('2d');
+        const labels = countyStats.map(stat => stat.county);
+        const data = countyStats.map(stat => stat.total);
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Reports per County',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateStatusChart(reportStats) {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Pending', 'In Progress'],
+                datasets: [{
+                    data: [
+                        reportStats.completed_reports,
+                        reportStats.pending_reports,
+                        reportStats.total_reports - reportStats.completed_reports - reportStats.pending_reports
+                    ],
+                    backgroundColor: [
+                        '#28a745',
+                        '#ffc107',
+                        '#17a2b8'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+    
+    function updateRecentReports(reports) {
+        const container = $('#recent-reports');
+        container.empty();
+        
+        reports.forEach(report => {
+            container.append(`
+                <li class="item">
+                    <div class="product-info">
+                        <a href="javascript:void(0)" class="product-title">
+                            ${report.title}
+                            <span class="badge badge-${getStatusBadge(report.status)} float-right">${report.status}</span>
+                        </a>
+                        <span class="product-description">
+                            ${report.county} - ${report.sublocation}
+                        </span>
+                    </div>
+                </li>
+            `);
+        });
+    }
+    
+    function updateRecentUsers(users) {
+        const container = $('#recent-users');
+        container.empty();
+        
+        users.forEach(user => {
+            container.append(`
+                <li class="item">
+                    <div class="product-info">
+                        <a href="javascript:void(0)" class="product-title">
+                            ${user.first_name} ${user.last_name}
+                            <span class="badge badge-${getRoleBadge(user.role)} float-right">${user.role}</span>
+                        </a>
+                        <span class="product-description">
+                            ${user.employee_id} - ${user.county}
+                        </span>
+                    </div>
+                </li>
+            `);
+        });
+    }
+    
+    function getStatusBadge(status) {
+        const statusMap = {
+            'completed': 'success',
+            'pending': 'warning',
+            'in_progress': 'info'
+        };
+        return statusMap[status] || 'secondary';
+    }
+    
+    function getRoleBadge(role) {
+        const roleMap = {
+            'agent': 'info',
+            'supervisor': 'success',
+            'manager': 'danger'
+        };
+        return roleMap[role] || 'secondary';
+    }
+});
+</script>
